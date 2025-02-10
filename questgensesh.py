@@ -36,9 +36,15 @@ from reportlab.lib.units import inch
 import nltk
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
-
-# Import MarkItDown
-from markitdown import MarkItDown
+# NEW evaluation metric imports
+from bert_score import score as bert_score
+from sentence_transformers import util
+#from bleurt import score as bleurt_score  # Corrected import
+import sys
+sys.path.append(r"\BARTScore")
+# In questgensesh.py:
+from BARTScore.bart_score import BARTScorer  # Notice the .
+from bleurt import score  # Corrected import:  bleurt-pytorch
 
 # ---------------------------
 # Configuration for External Tools
@@ -55,7 +61,7 @@ qdrant_client = QdrantClient(
     api_key="vtf2RP3Po5HXFgdFHHkM8a-ZFlTrk9bMbHWkoixtKoMVU6Rd24rgBQ"
 )
 
-api_key = "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"
+api_key = "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" # Replace with your actual OpenAI API Key
 os.environ["OPENAI_API_KEY"] = api_key
 
 # ---------------------------
@@ -79,11 +85,25 @@ os.makedirs(EXTRACTED_IMAGES_DIR, exist_ok=True)
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # ---------------------------
+#  BLEURT and BARTScorer Initialization (Outside Functions - IMPORTANT)
+# ---------------------------
+
+# Initialize BLEURT scorer *once* outside any function.  This is MUCH more efficient.
+#bleurt_checkpoint = "bleurt-large-512"  # Or another checkpoint like "BLEURT-20"
+bleurt_scorer = score.BleurtScorer()
+
+# Initialize BARTScorer *once* outside any function.
+bart_scorer = BARTScorer(device='cpu', checkpoint='facebook/bart-large-cnn')  # Or 'cuda'
+
+
+
+# ---------------------------
 # Function Definitions
 # ---------------------------
 def process_file_content_text(file_path):
     """
     Processes the text content of a PDF using pdf2image and pytesseract.
+    (Reverted to original, without paragraph handling)
     """
     try:
         pages = convert_from_path(file_path)
@@ -190,20 +210,35 @@ def clean_text(text):
     text = re.sub(r'[^\x00-\x7F]+', '', text)
     return text.strip()
 
-def split_text(text, chunk_size=800, chunk_overlap=110):
+def split_text(text, chunk_size=1024, tolerance=20):
     """
-    Splits text into overlapping chunks.
+    Splits text into chunks, aiming for a size close to chunk_size,
+    but allowing for a tolerance and preferring to split at sentence ends.
     """
     chunks = []
     start = 0
     while start < len(text):
-        end = start + chunk_size
-        chunk = text[start:end]
-        chunks.append(chunk)
-        start = end - chunk_overlap
-    print(f"Split text into {len(chunks)} chunks.")
-    return chunks
+        # Ideal end point
+        ideal_end = start + chunk_size
+        # Maximum end point considering tolerance
+        max_end = ideal_end + tolerance
 
+        # If we're close to the end of the text, just take what's left
+        if max_end >= len(text):
+            chunks.append(text[start:])
+            break
+
+        # Find the nearest full stop within the tolerance range
+        end = text.rfind('.', start + chunk_size - tolerance, max_end)
+
+        # If no full stop is found within tolerance, force split at max_end
+        if end == -1:
+            end = max_end
+
+        chunks.append(text[start:end + 1])  # Include the full stop
+        start = end + 1  # Move past the full stop
+
+    return chunks
 def embed_text_chunks(chunks, model):
     """
     Embeds text chunks using a Sentence Transformer model.
@@ -222,15 +257,15 @@ def insert_into_qdrant(collection_name, embeddings, chunks, additional_metadata:
         batch_chunks = chunks[i:i + batch_size]
         points = [
             PointStruct(
-                id=index,
+                id=str(uuid.uuid4()),  # Use UUID for unique IDs
                 vector=embedding,
                 payload={
                     "text": chunk,
-                    "session_id": session_id,
+                    "session_id": session_id, # Use passed session_id!
                     **additional_metadata
                 }
             )
-            for index, (embedding, chunk) in enumerate(zip(batch_embeddings, batch_chunks), start=i)
+            for embedding, chunk in zip(batch_embeddings, batch_chunks)
         ]
         qdrant_client.upsert(collection_name=collection_name, points=points)
         total_points += len(points)
@@ -315,74 +350,104 @@ def search_results_from_qdrant(qdrant_client, collection_name, embedded_vector, 
 
 def evaluate_generated_questions(candidate: str, reference: str):
     """
-    Computes BLEU and ROUGE scores to evaluate generated questions.
+    Compute various evaluation metrics for the generated questions.
+    Returns a dictionary of scores.
     """
+    # Tokenize sentences for BLEU (if needed - depends on your questions)
     candidate_sentences = [s.strip() for s in candidate.split('.') if s.strip()]
     reference_sentences = [s.strip() for s in reference.split('.') if s.strip()]
 
+    # Compute BLEU-4
     smoothie = SmoothingFunction().method4
-    bleu_scores = []
-    for cand in candidate_sentences:
-        score = sentence_bleu([reference_sentences], cand.split(), smoothing_function=smoothie)
-        bleu_scores.append(score)
+    bleu_scores = [
+        sentence_bleu([reference_sentences], cand.split(), smoothing_function=smoothie)
+        for cand in candidate_sentences
+    ]
     avg_bleu = sum(bleu_scores) / len(bleu_scores) if bleu_scores else 0
 
+    # Compute ROUGE scores
     scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
     rouge_scores = scorer.score(reference, candidate)
 
-    scores = {
-        "BLEU": avg_bleu,
-        "ROUGE-1": rouge_scores['rouge1'].fmeasure,
-        "ROUGE-2": rouge_scores['rouge2'].fmeasure,
-        "ROUGE-L": rouge_scores['rougeL'].fmeasure
+    # Compute BERTScore
+    _, _, bertscore_f1 = bert_score([candidate], [reference], lang="en", rescale_with_baseline=True)
+    bertscore_f1 = bertscore_f1.mean().item()
+
+    # Compute BLEURT - Use pre-initialized scorer
+    bleurt_scores_list = bleurt_scorer.score(references=[reference], candidates=[candidate])
+    bleurt_score = sum(bleurt_scores_list) / len(bleurt_scores_list) if bleurt_scores_list else 0
+
+
+    # Compute BARTScore - Use pre-initialized scorer
+    bart_scores_list = bart_scorer.score([reference], [candidate], batch_size=4)  # Returns a list
+    bartscore = sum(bart_scores_list) / len(bart_scores_list) if bart_scores_list else 0
+
+
+
+    # Compute Q-BLEU4 (custom BLEU4 for question generation)
+    q_bleu4 = bleu_scores[-1] if bleu_scores else 0
+
+    # Compute QSTS (semantic similarity using Sentence-BERT)
+    qsts_score = util.pytorch_cos_sim(model.encode(candidate), model.encode(reference)).item()
+
+
+    return {
+        "BLEU-4": avg_bleu,
+        "ROUGE-L": rouge_scores['rougeL'].fmeasure,
+        "BERTScore": bertscore_f1,
+        "BLEURT": bleurt_score,
+        "BARTScore": bartscore,
+        "Q-BLEU4": q_bleu4,
+        "QSTS": qsts_score,
     }
-    print(f"Evaluation scores: {scores}")
-    return scores
 
 def regenerate_questions_if_needed(current_questions: str, reference: str, final_prompt: str, thresholds: dict):
     """
-    Evaluates generated questions and regenerates them if below defined thresholds.
+    Evaluate generated questions and, if below threshold, regenerate with feedback.
+    Returns final accepted questions and feedback.
     """
     scores = evaluate_generated_questions(current_questions, reference)
     print("Evaluation Metrics:", scores)
     below_threshold = False
     feedback_comments = []
 
+    # Check each metric against its threshold
     for metric, score in scores.items():
         if score < thresholds.get(metric, 0):
             below_threshold = True
             feedback_comments.append(f"{metric} score is {score:.2f}, which is below the threshold of {thresholds[metric]:.2f}.")
 
     if below_threshold:
+        # Append feedback into prompt for regeneration
         feedback_text = " ".join(feedback_comments) + " Please regenerate the questions with improvements addressing these issues."
         augmented_prompt = final_prompt + "\n\n" + feedback_text
-        print("Feedback for regeneration:", feedback_text)
         new_questions = get_gpt_response("You are a helpful assistant skilled at automatic question generation.", augmented_prompt)
-        print("Regenerated questions.")
+        # Optionally, one might run a loop until scores are acceptable.
         return new_questions, feedback_text, scores
     else:
-        print("All evaluation metrics are above thresholds.")
         return current_questions, "All evaluation metrics are above thresholds.", scores
 
-
-def generate_questions(final_user_prompt_path, updated_final_user_prompt_path, retrieved_context, course_name, num_questions, academic_level, taxonomy, topics_list, major, evaluation_prompt_path, updated_evaluation_prompt_path):
+def generate_questions(final_user_prompt_path, updated_final_user_prompt_path, retrieved_context, course_name, num_questions, academic_level, taxonomy, topics_list, major, evaluation_prompt_path, updated_evaluation_prompt_path, thresholds):
     """Generates questions based on retrieved context and user prompt."""
 
     # Fill placeholders in the final user prompt
     placeholders_final = {
-        "user_prompt": "{user_prompt}",  # Placeholder for the initial user prompt (filled in later)
+        #"user_prompt": "{user_prompt}",  # <--- REMOVE THIS LINE, it's incorrect.
         "content": retrieved_context,
         "num_questions": num_questions,
         "course_name": course_name,
         "taxonomy": taxonomy,
         "major": major,
-        "academic_level": academic_level
+        "academic_level": academic_level,
+        "topics_list" : topics_list
     }
     fill_placeholders(final_user_prompt_path, updated_final_user_prompt_path, placeholders_final)
+
 
     with open(updated_final_user_prompt_path, "r", encoding="utf8") as file:
         final_user_prompt = file.read()
 
+    #final_user_prompt = final_user_prompt.replace("{user_prompt}", final_user_prompt) #Corrected
     # Generate initial questions
     print("Generating initial questions using final prompt...")
     initial_questions = get_gpt_response("You are a helpful assistant skilled at automatic question generation.", final_user_prompt)
@@ -393,7 +458,7 @@ def generate_questions(final_user_prompt_path, updated_final_user_prompt_path, r
         "academic_level": academic_level,
         "course_name": course_name,
         "major": major,
-        "topic_list": topics_list,  # Corrected variable name
+        "topics_list": topics_list,  # Corrected variable name
         "taxonomy_level": taxonomy,
         "question_content": initial_questions
     }
@@ -403,20 +468,10 @@ def generate_questions(final_user_prompt_path, updated_final_user_prompt_path, r
     with open(updated_evaluation_prompt_path, 'r', encoding='utf-8') as f:
         evaluation_prompt_content = f.read()
 
-    # Get evaluation and feedback
-    print("Evaluating generated questions...")
-    evaluation_feedback = get_gpt_response("You are an experienced instructor.", evaluation_prompt_content)
-    print("Evaluation feedback:", evaluation_feedback)
-    
-    # Check if the feedback suggests rejecting the questions.
-    if "reject" in evaluation_feedback.lower():  # Simple check, can be made more robust
-      #Regenerate
-        print("Regenerating the questions addressing feedback")
-        regenerated_questions = get_gpt_response("You are an experienced instructor.", evaluation_prompt_content + "\n\n" + "Please regenerate the question addressing the following issues: " + evaluation_feedback)
-        return regenerated_questions, evaluation_feedback # Return regenerated questions.
-
-    return initial_questions, evaluation_feedback # Return initial questions and feedback.
-
+    regenerated_questions, feedback, scores = regenerate_questions_if_needed(
+    initial_questions, retrieved_context, final_user_prompt, thresholds
+)
+    return regenerated_questions, feedback, scores  # Return questions, feedback, and scores
 
 
 # ---------------------------
@@ -427,11 +482,11 @@ def main():
 
     # ----------- Text Extraction -----------
     print("Starting text extraction (text-only)...")
-    text_content = process_file_content_text(pdf_path)
+    text_content = process_file_content_text(pdf_path) # Reverted function
     cleaned_text = clean_text(text_content)
     print("Text extraction completed.")
 
-    # ----------- Diagram/Graph/Illustration Extraction & Insight Analysis -----------
+     # ----------- Diagram/Graph/Illustration Extraction & Insight Analysis -----------
     print("Starting diagram extraction and insight analysis...")
     diagram_insights = process_file_content_image(pdf_path)
     cleaned_diagram_insights = clean_text(diagram_insights)
@@ -441,16 +496,15 @@ def main():
     combined_text = cleaned_text + " " + cleaned_diagram_insights
     print(f"Combined text length: {len(combined_text)} characters.")
 
-    # ----------- Embedding & Storing in Qdrant (Text Collection Only) -----------
+
+    # --- Embedding & Storing in Qdrant (Text Collection Only) -----------
     print("Splitting combined text into chunks...")
-    text_chunks = split_text(combined_text)
+    text_chunks = split_text(combined_text, chunk_size=1024, tolerance=20)  # Use split_text
     print("Embedding text chunks...")
     text_embeddings = embed_text_chunks(text_chunks, model)
     print("Inserting text chunks into Qdrant...")
     insert_into_qdrant("qgen", text_embeddings, text_chunks, document_metadata)
     print("Text and diagram insights processing and storage completed.")
-
-
 
     # --- Define parameters (can be from user input or config) ---
     course_name = "Data Structures and Algorithms"
@@ -460,6 +514,18 @@ def main():
     topics_list = "Breadth First Search, Shortest Path"  # Comma-separated
     major = "Computer Science"
     topics = topics_list  # For the hypothetical text generation
+
+     # --- Define Thresholds ---
+    thresholds = {
+    "BLEU-4": 0.1,
+    "ROUGE-L": 0.2,
+    "BERTScore": 0.4,
+    "BLEURT": 0.3,
+    "BARTScore": -0.5,
+    "Q-BLEU4": 0.1,
+    "QSTS": 0.3,
+}
+
 
     # --- Hypothetical Sub-topic Generation ---
     hypothetical_prompt_path = r"content/hypothetical_prompt.txt"
@@ -503,30 +569,18 @@ def main():
     with open(updated_user_prompt_path, "r", encoding="utf8") as file:
         updated_user_prompt = file.read() #Storing filled user prompt to use it later for final prompt
 
-    placeholders_final = {
-        "user_prompt": updated_user_prompt,  # Use the *filled* user prompt
-        "content": retrieved_context,  # Use the retrieved context
-        "num_questions": num_questions,
-        "course_name": course_name,
-        "taxonomy": taxonomy_level,
-        "major": major,
-        "academic_level": academic_level,
-        "topics_list": topics_list  #  <-- ADD THIS LINE!
-    }
-
-    # Fill placeholders in final_user_prompt.txt and save to updated_final_user_prompt.txt
-    fill_placeholders(final_user_prompt_path, updated_final_user_prompt_path, placeholders_final)
-
-    generated_questions, evaluation_feedback = generate_questions(
+    generated_questions, evaluation_feedback, scores  = generate_questions(
         final_user_prompt_path, updated_final_user_prompt_path, retrieved_context,
         course_name, num_questions, academic_level, taxonomy_level,
-        topics_list, major, evaluation_prompt_path, updated_evaluation_prompt_path
+        topics_list, major, evaluation_prompt_path, updated_evaluation_prompt_path, thresholds
     )
 
     print("\nGenerated Questions:")
     print(generated_questions)
     print("\nEvaluation Feedback:")
     print(evaluation_feedback)
+    print("\nEvaluation scores:")
+    print(scores)
 
 
 if __name__ == "__main__":

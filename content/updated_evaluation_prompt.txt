@@ -3,7 +3,7 @@ You have experience creating assessments for the course. Your task is to assess 
 
 Please make sure you read and understand the following content and instructions carefully.
 
-Course topic: Breadth First Search, Shortest Path
+Course topic: {topic_list}
 Taxonomy Level: Create
 
 Please find the explanation of each level of the Bloom's taxonomy:
@@ -47,23 +47,21 @@ Evaluation steps:
 5. Generate a simple feedback for all the questions together explaining whether it can be accepted or not. If not, explain why. 
 
 Questions to evaluate:
-### Data Structures and Algorithms - Bloom's Taxonomy: Create
-
-1. Design a detailed algorithm for performing a breadth-first search on a directed graph, emphasizing the steps to maintain a frontier set and track levels of vertices.
-2. Propose a method to construct the shortest-path tree for a given vertex in a directed graph, outlining the process of iteratively tracing back to the source vertex.
-3. Formulate an approach to identify and list vertices that are unreachable from a specified starting vertex in a graph, highlighting the role of level assignments.
-4. Devise a novel application scenario where graph search algorithms such as breadth-first search can be effectively employed, detailing the problem, input, and expected output.
-5. Develop a strategy to represent a graph using an adjacency list, explaining how it simplifies the storage and retrieval of graph information efficiently.
-6. Create a step-by-step guide on how web crawling can be implemented using graph traversal techniques, illustrating how search engines like Google discover new web pages.
-7. Invent a new graph-based algorithm for network broadcast routing, outlining the key data structures and operations involved in efficiently distributing messages across a network.
-8. Devise a method to apply breadth-first search to perform garbage collection in a memory-managed environment, highlighting the benefits of using graph traversal for resource cleanup.
-9. Design a system that utilizes graph search algorithms to detect and verify mathematical conjectures, discussing the approach's effectiveness and limitations.
-10. Propose a novel puzzle-solving strategy using graph theory principles, explaining how graph traversal can be employed to efficiently search for solutions in complex puzzle scenarios.
-11. Create a detailed blueprint for model checking using finite state machines, illustrating how graphs can represent system states and transitions for formal verification.
-12. Formulate a plan for checking the solvability of a Pocket Cube (2x2x2 Rubik's Cube) configuration graph, detailing the steps to determine the minimum number of moves required to solve any state.
-13. Invent an algorithm to identify the hardest-to-solve configurations in a Rubik's Cube, considering factors such as reversibility of moves and the concept of "God's Number" for different cube sizes.
-14. Devise a method to extend the breadth-first search algorithm to handle graph exploration tasks in social networking platforms, enabling efficient friend-finding functionality.
-15. Create a novel graph-based approach for automated puzzle-solving in games, outlining how graph traversal techniques can be used to explore possible moves and reach optimal solutions in gaming scenarios.
+1. Explain the process of finding the shortest path in a directed graph using the parent pointers starting from vertex v until reaching the source vertex s.
+2. Describe the significance of parent pointers in determining the shortest path from a vertex v to the source vertex s in a graph.
+3. Compare and contrast the traversal techniques used to navigate through a directed graph with parent pointers for finding the shortest path.
+4. Analyze the complexity of finding the shortest path using parent pointers in a directed graph and discuss any potential optimizations.
+5. Develop a step-by-step algorithm to trace the shortest path from a given vertex v to the source vertex s using the parent pointers in a directed graph.
+6. Evaluate the efficiency of the shortest path algorithm based on parent pointers in a directed graph and propose improvements for enhancing its performance.
+7. Formulate a pseudo code for a recursive function that follows parent pointers to determine the shortest path from a vertex v to the source vertex s in a directed graph.
+8. Justify the choice of using parent pointers rather than other data structures for navigating through a graph to find the shortest path.
+9. Infer the implications of cyclic structures in a directed graph on the process of finding the shortest path using parent pointers.
+10. Correlate the concept of parent pointers with tree traversal algorithms and explain how they differ in the context of finding the shortest path.
+11. Illustrate the importance of maintaining parent pointers accurately in a directed graph when applying algorithms for pathfinding.
+12. Propose a method to handle situations where a vertex does not have a parent pointer while traversing towards the source vertex s in a directed graph.
+13. Investigate the role of path compression techniques in optimizing the traversal process based on parent pointers for finding the shortest path.
+14. Elaborate on how the choice of starting vertex impacts the efficiency of determining the shortest path using parent pointers in a directed graph.
+15. Discuss the challenges associated with updating parent pointers during graph traversal and suggest strategies to overcome these obstacles effectively.
 
 Provide appropriate justification for accepting or rejecting a question.
 Do not give unnecessary text with special characters.
