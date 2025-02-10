@@ -339,6 +339,9 @@ def search_results_from_qdrant(qdrant_client, collection_name, embedded_vector, 
     query_filter = None
     if session_id_filter:
         query_filter = Filter(must=[FieldCondition(key="session_id", match=MatchValue(value=session_id_filter))])
+    else: #Added this
+        query_filter = None
+
     search_results = qdrant_client.search(
         collection_name=collection_name,
         query_vector=embedded_vector.tolist(),
@@ -430,16 +433,27 @@ def regenerate_questions_if_needed(current_questions: str, reference: str, final
 def generate_questions(final_user_prompt_path, updated_final_user_prompt_path, retrieved_context, course_name, num_questions, academic_level, taxonomy, topics_list, major, evaluation_prompt_path, updated_evaluation_prompt_path, thresholds):
     """Generates questions based on retrieved context and user prompt."""
 
+    # Define Bloom's Taxonomy descriptions
+    blooms_taxonomy_descriptions = """
+    Please find the explanation of each level of the Bloom's taxonomy:
+    Remember: retrieve, recall, or recognize relevant knowledge from long-term memory.
+    Understand: demonstrate comprehension through one or more forms of explanation.
+    Apply: use information or a skill in a new situation.
+    Analyze: break material into its constituent parts and determine how the parts relate to one another and/or to an overall structure or purpose.
+    Evaluate: make judgments based on criteria and standards.
+    Create: put elements together to form a new coherent or functional whole; reorganize elements into a new pattern or structure.
+    """
+
     # Fill placeholders in the final user prompt
     placeholders_final = {
-        #"user_prompt": "{user_prompt}",  # <--- REMOVE THIS LINE, it's incorrect.
         "content": retrieved_context,
         "num_questions": num_questions,
         "course_name": course_name,
         "taxonomy": taxonomy,
         "major": major,
         "academic_level": academic_level,
-        "topics_list" : topics_list
+        "topics_list": topics_list,
+        "blooms_taxonomy_descriptions": blooms_taxonomy_descriptions,  # Add Bloom's descriptions
     }
     fill_placeholders(final_user_prompt_path, updated_final_user_prompt_path, placeholders_final)
 
@@ -447,7 +461,6 @@ def generate_questions(final_user_prompt_path, updated_final_user_prompt_path, r
     with open(updated_final_user_prompt_path, "r", encoding="utf8") as file:
         final_user_prompt = file.read()
 
-    #final_user_prompt = final_user_prompt.replace("{user_prompt}", final_user_prompt) #Corrected
     # Generate initial questions
     print("Generating initial questions using final prompt...")
     initial_questions = get_gpt_response("You are a helpful assistant skilled at automatic question generation.", final_user_prompt)
@@ -458,7 +471,7 @@ def generate_questions(final_user_prompt_path, updated_final_user_prompt_path, r
         "academic_level": academic_level,
         "course_name": course_name,
         "major": major,
-        "topics_list": topics_list,  # Corrected variable name
+        "topics_list": topics_list,
         "taxonomy_level": taxonomy,
         "question_content": initial_questions
     }
@@ -538,7 +551,8 @@ def main():
     # --- Search Qdrant using Hypothetical Text ---
     print(f"Performing a search in Qdrant for query: '{hypothetical_text}'")
     query_embedding = model.encode(hypothetical_text)
-    search_results = search_results_from_qdrant(qdrant_client, "qgen", query_embedding, limit=5)
+     # Pass session_id to filter results
+    search_results = search_results_from_qdrant(qdrant_client, "qgen", query_embedding, limit=15, session_id_filter=session_id)
     print("Search Results:")
     retrieved_context = ""
     for result in search_results:

@@ -47,21 +47,35 @@ Evaluation steps:
 5. Generate a simple feedback for all the questions together explaining whether it can be accepted or not. If not, explain why. 
 
 Questions to evaluate:
-1. Explain the process of finding the shortest path in a directed graph using the parent pointers starting from vertex v until reaching the source vertex s.
-2. Describe the significance of parent pointers in determining the shortest path from a vertex v to the source vertex s in a graph.
-3. Compare and contrast the traversal techniques used to navigate through a directed graph with parent pointers for finding the shortest path.
-4. Analyze the complexity of finding the shortest path using parent pointers in a directed graph and discuss any potential optimizations.
-5. Develop a step-by-step algorithm to trace the shortest path from a given vertex v to the source vertex s using the parent pointers in a directed graph.
-6. Evaluate the efficiency of the shortest path algorithm based on parent pointers in a directed graph and propose improvements for enhancing its performance.
-7. Formulate a pseudo code for a recursive function that follows parent pointers to determine the shortest path from a vertex v to the source vertex s in a directed graph.
-8. Justify the choice of using parent pointers rather than other data structures for navigating through a graph to find the shortest path.
-9. Infer the implications of cyclic structures in a directed graph on the process of finding the shortest path using parent pointers.
-10. Correlate the concept of parent pointers with tree traversal algorithms and explain how they differ in the context of finding the shortest path.
-11. Illustrate the importance of maintaining parent pointers accurately in a directed graph when applying algorithms for pathfinding.
-12. Propose a method to handle situations where a vertex does not have a parent pointer while traversing towards the source vertex s in a directed graph.
-13. Investigate the role of path compression techniques in optimizing the traversal process based on parent pointers for finding the shortest path.
-14. Elaborate on how the choice of starting vertex impacts the efficiency of determining the shortest path using parent pointers in a directed graph.
-15. Discuss the challenges associated with updating parent pointers during graph traversal and suggest strategies to overcome these obstacles effectively.
+1. Develop an algorithm in Python to implement the breadth-first search (BFS) for a directed graph using the given graph representation.
+
+2. Design a data structure that efficiently stores the adjacency list for a graph to support the BFS algorithm described in the study material.
+
+3. Create a step-by-step guide illustrating how the breadth-first search algorithm can be used to find the shortest path in a directed graph with sample vertices and edges.
+
+4. Propose a method to improve the time complexity of BFS for directed graphs without affecting the correctness of the shortest path calculation based on the provided content.
+
+5. Formulate a plan to apply the breadth-first search algorithm to solve a network routing problem where each node represents a network device and edges represent network connections.
+
+6. Construct a pseudocode for a breadth-first search variation that prioritizes exploring vertices in a level based on specific criteria or constraints beyond edge connections.
+
+7. Devise a strategy to implement a modified BFS algorithm that can handle different edge weights while finding the shortest path in a weighted directed graph.
+
+8. Generate a comprehensive explanation detailing the application of the breadth-first search algorithm in web crawling and how it assists search engines like Google in finding web pages efficiently.
+
+9. Conceive an innovative approach to extend the BFS algorithm to identify and locate unreachable vertices in a graph from a starting vertex.
+
+10. Develop a software design pattern that leverages the BFS algorithm to detect and manage memory leaks in a garbage collection system effectively.
+
+11. Formulate a detailed proposal outlining the utilization of breadth-first search in model checking processes to verify the correctness of finite state machine models.
+
+12. Create a novel BFS-based strategy for optimizing the solving of puzzles and games by minimizing the number of moves required to reach a solution state.
+
+13. Design an experimental setup to compare the efficiency of breadth-first search versus depth-first search for solving complex mathematical conjectures with large state spaces.
+
+14. Propose an enhanced BFS variant tailored specifically for graph traversal in social networking platforms to efficiently recommend connections between users.
+
+15. Construct an adaptive BFS algorithm that dynamically adjusts the search heuristic based on the graph structure, aimed at reducing the overall computation time for different graph topologies.
 
 Provide appropriate justification for accepting or rejecting a question.
 Do not give unnecessary text with special characters.
