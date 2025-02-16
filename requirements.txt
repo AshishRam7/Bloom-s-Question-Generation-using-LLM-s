@@ -1,0 +1,17 @@
+requests
+pdf2image
+pytesseract
+Pillow
+python-docx
+python-pptx
+openai
+qdrant-client
+sentence-transformers
+transformers
+moondream
+reportlab
+nltk
+rouge-score
+bert-score
+bleurt-pytorch
+BARTScore
