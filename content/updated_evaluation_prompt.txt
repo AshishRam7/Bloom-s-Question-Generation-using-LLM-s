@@ -47,35 +47,39 @@ Evaluation steps:
 5. Generate a simple feedback for all the questions together explaining whether it can be accepted or not. If not, explain why. 
 
 Questions to evaluate:
-1. Develop an algorithm in Python to implement the breadth-first search (BFS) for a directed graph using the given graph representation.
+Here are 15 Create-level questions aligned with Bloom's taxonomy for a Data Structures and Algorithms examination, strictly based on the provided study material:
 
-2. Design a data structure that efficiently stores the adjacency list for a graph to support the BFS algorithm described in the study material.
+1. Design a hybrid graph traversal algorithm that combines the queue-based structure of BFS with the backtracking mechanism of DFS to optimize garbage collection route planning in cyclic urban networks. Specify how your algorithm would maintain efficiency while ensuring complete coverage.
 
-3. Create a step-by-step guide illustrating how the breadth-first search algorithm can be used to find the shortest path in a directed graph with sample vertices and edges.
+2. Create a modified version of Dijkstra's algorithm that simultaneously tracks both physical distance and road quality scores (as separate weights) when calculating optimal trucking routes. Outline the data structures required for this dual-weight shortest path implementation.
 
-4. Propose a method to improve the time complexity of BFS for directed graphs without affecting the correctness of the shortest path calculation based on the provided content.
+3. Develop a memory-efficient adaptation of the Minimum Spanning Tree algorithm for IoT sensor networks with constrained edge devices. Incorporate Boruvka's parallel processing approach while considering the graph's sparse nature and energy consumption constraints.
 
-5. Formulate a plan to apply the breadth-first search algorithm to solve a network routing problem where each node represents a network device and edges represent network connections.
+4. Propose a new pathfinding metric that combines hop count, edge weights, and node centrality measures for emergency response routing systems. Formalize your composite cost function and justify how it would improve upon traditional shortest path calculations.
 
-6. Construct a pseudocode for a breadth-first search variation that prioritizes exploring vertices in a level based on specific criteria or constraints beyond edge connections.
+5. Construct a distributed processing framework that integrates both node-centric and relationship-centric approaches to handle real-time updates in a dynamic transportation graph. Specify how you would manage synchronization between Spark partitions and Neo4j graph database updates.
 
-7. Devise a strategy to implement a modified BFS algorithm that can handle different edge weights while finding the shortest path in a weighted directed graph.
+6. Design a hybrid recommendation system that employs both personalized PageRank for user similarity and random walks with restart for serendipitous discovery in a bipartite user-product graph. Detail the graph schema and walk propagation rules.
 
-8. Generate a comprehensive explanation detailing the application of the breadth-first search algorithm in web crawling and how it assists search engines like Google in finding web pages efficiently.
+7. Create an adaptive algorithm selector that automatically chooses between A* and Yen's k-Shortest Paths based on real-time traffic density metrics and anticipated query complexity. Outline your decision criteria matrix and switching mechanism.
 
-9. Conceive an innovative approach to extend the BFS algorithm to identify and locate unreachable vertices in a graph from a starting vertex.
+8. Develop a novel graph compression technique leveraging properties of k-partite structures to optimize memory usage for large-scale social network analysis in Neo4j. Include specific node labeling strategies and relationship storage optimizations.
 
-10. Develop a software design pattern that leverages the BFS algorithm to detect and manage memory leaks in a garbage collection system effectively.
+9. Propose a modified Strongly Connected Components algorithm that identifies bridge nodes between components while calculating connectivity. Implement this using message passing in a node-centric processing model and specify the additional data structures required.
 
-11. Formulate a detailed proposal outlining the utilization of breadth-first search in model checking processes to verify the correctness of finite state machine models.
+10. Design a dynamic graph partitioning scheme for the All Pairs Shortest Path problem that minimizes network shuffling in Spark while handling frequent edge weight updates. Incorporate delta-stepping concepts and define your persistence strategy.
 
-12. Create a novel BFS-based strategy for optimizing the solving of puzzles and games by minimizing the number of moves required to reach a solution state.
+11. Create a multi-criteria optimization framework for the Single Source Shortest Path problem that balances fuel efficiency, toll costs, and carbon emissions in logistics planning. Formalize your constraint satisfaction model and implement it as an extension of Dijkstra's algorithm.
 
-13. Design an experimental setup to compare the efficiency of breadth-first search versus depth-first search for solving complex mathematical conjectures with large state spaces.
+12. Develop a graph sampling technique combining random walks with Hamiltonian path detection to create representative subgraphs for machine learning training. Specify your node selection criteria and termination conditions while maintaining path connectivity.
 
-14. Propose an enhanced BFS variant tailored specifically for graph traversal in social networking platforms to efficiently recommend connections between users.
+13. Propose a new centrality metric that synthesizes betweenness centrality with temporal edge weights to identify critical infrastructure nodes in evolving power grid networks. Formalize your time-aware centrality calculation formula.
 
-15. Construct an adaptive BFS algorithm that dynamically adjusts the search heuristic based on the graph structure, aimed at reducing the overall computation time for different graph topologies.
+14. Design a parallelized implementation of the Eulerian path detection algorithm optimized for Neo4j's native graph storage. Include Cypher query optimizations and index strategies to efficiently verify the degree parity condition across large datasets.
+
+15. Create a disaster recovery protocol for distributed graph processing that maintains algorithm state consistency across Spark worker nodes and Neo4j database replicas during network partitions. Specify your checkpointing strategy and failover mechanisms.
+
+These questions require students to synthesize multiple concepts from the study materials, develop novel solutions, and create optimized implementations while considering real-world constraints and system architectures mentioned in the context.
 
 Provide appropriate justification for accepting or rejecting a question.
 Do not give unnecessary text with special characters.

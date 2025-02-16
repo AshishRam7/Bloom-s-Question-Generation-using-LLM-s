@@ -491,7 +491,7 @@ def generate_questions(final_user_prompt_path, updated_final_user_prompt_path, r
 # Main Code Execution
 # ---------------------------
 def main():
-    pdf_path = r"content/BFS_notespdf.pdf"
+    pdf_path = r"content/GraphAlgorithms.pdf"
 
     # ----------- Text Extraction -----------
     print("Starting text extraction (text-only)...")
@@ -552,7 +552,7 @@ def main():
     print(f"Performing a search in Qdrant for query: '{hypothetical_text}'")
     query_embedding = model.encode(hypothetical_text)
      # Pass session_id to filter results
-    search_results = search_results_from_qdrant(qdrant_client, "qgen", query_embedding, limit=15, session_id_filter=session_id)
+    search_results = search_results_from_qdrant(qdrant_client, "qgen", query_embedding, limit=30, session_id_filter=session_id)
     print("Search Results:")
     retrieved_context = ""
     for result in search_results:
