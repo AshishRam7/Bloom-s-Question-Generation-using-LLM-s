@@ -47,39 +47,37 @@ Evaluation steps:
 5. Generate a simple feedback for all the questions together explaining whether it can be accepted or not. If not, explain why. 
 
 Questions to evaluate:
-Here are 15 Create-level questions aligned with Bloom's taxonomy for a Data Structures and Algorithms examination, strictly based on the provided study material:
+Here are 15 Create-level questions based on the study material, adhering to Bloom's taxonomy for Data Structures & Algorithms:
 
-1. Design a hybrid graph traversal algorithm that combines the queue-based structure of BFS with the backtracking mechanism of DFS to optimize garbage collection route planning in cyclic urban networks. Specify how your algorithm would maintain efficiency while ensuring complete coverage.
+1. Design a hybrid recommendation system for hotels that combines Betweenness Centrality scores with collaborative filtering techniques, leveraging insights from the Yelp dataset analysis described in the material.
 
-2. Create a modified version of Dijkstra's algorithm that simultaneously tracks both physical distance and road quality scores (as separate weights) when calculating optimal trucking routes. Outline the data structures required for this dual-weight shortest path implementation.
+2. Develop a novel graph-based feature selection method for spam detection that integrates PageRank scores with triadic closure properties, improving upon the existing approaches mentioned in the connected features research.
 
-3. Develop a memory-efficient adaptation of the Minimum Spanning Tree algorithm for IoT sensor networks with constrained edge devices. Incorporate Boruvka's parallel processing approach while considering the graph's sparse nature and energy consumption constraints.
+3. Propose a modified Louvain algorithm variant that incorporates edge weights and node centrality measures to optimize community detection in social networks with heterogeneous connection strengths.
 
-4. Propose a new pathfinding metric that combines hop count, edge weights, and node centrality measures for emergency response routing systems. Formalize your composite cost function and justify how it would improve upon traditional shortest path calculations.
+4. Create a pipeline architecture that automatically integrates Label Propagation community detection with triangle count features to enhance machine learning models for link prediction in citation networks.
 
-5. Construct a distributed processing framework that integrates both node-centric and relationship-centric approaches to handle real-time updates in a dynamic transportation graph. Specify how you would manage synchronization between Spark partitions and Neo4j graph database updates.
+5. Design an adaptive PageRank implementation using Apache Spark that dynamically adjusts damping factors based on node connectivity patterns observed in transactional graphs.
 
-6. Design a hybrid recommendation system that employs both personalized PageRank for user similarity and random walks with restart for serendipitous discovery in a bipartite user-product graph. Detail the graph schema and walk propagation rules.
+6. Devise a synergistic system combining weak/strongly connected components analysis with clustering coefficients to identify structurally critical nodes in infrastructure networks while maintaining O(n log n) time complexity.
 
-7. Create an adaptive algorithm selector that automatically chooses between A* and Yen's k-Shortest Paths based on real-time traffic density metrics and anticipated query complexity. Outline your decision criteria matrix and switching mechanism.
+7. Construct a polynomial-time algorithm for social influence maximization that simultaneously optimizes for Betweenness Centrality and triadic closure properties in multiplex networks, following the voting behavior insights from Figure 8-1.
 
-8. Develop a novel graph compression technique leveraging properties of k-partite structures to optimize memory usage for large-scale social network analysis in Neo4j. Include specific node labeling strategies and relationship storage optimizations.
+8. Architect a real-time recommendation engine for Yelp restaurants that dynamically combines community detection results with weighted shortest path calculations across multiple relationship types (reviews, check-ins, social connections).
 
-9. Propose a modified Strongly Connected Components algorithm that identifies bridge nodes between components while calculating connectivity. Implement this using message passing in a node-centric processing model and specify the additional data structures required.
+9. Create a neural network architecture that uses graph embeddings generated from the Bellagio hotel's superconnector identification process as input features for predicting potential high-value customers.
 
-10. Design a dynamic graph partitioning scheme for the All Pairs Shortest Path problem that minimizes network shuffling in Spark while handling frequent edge weight updates. Incorporate delta-stepping concepts and define your persistence strategy.
+10. Design a privacy-preserving variant of the RA-Brandes algorithm for distributed betweenness centrality computation in healthcare networks, addressing key challenges identified in the real-world implementations.
 
-11. Create a multi-criteria optimization framework for the Single Source Shortest Path problem that balances fuel efficiency, toll costs, and carbon emissions in logistics planning. Formalize your constraint satisfaction model and implement it as an extension of Dijkstra's algorithm.
+11. Propose a novel graph convolution operator that integrates triadic census metrics with local clustering coefficients to improve node classification accuracy in social network analysis tasks.
 
-12. Develop a graph sampling technique combining random walks with Hamiltonian path detection to create representative subgraphs for machine learning training. Specify your node selection criteria and termination conditions while maintaining path connectivity.
+12. Develop a streaming algorithm framework that incrementally updates community structures (using Label Propagation) and influence scores (via PageRank) simultaneously as new edges arrive in dynamic social networks.
 
-13. Propose a new centrality metric that synthesizes betweenness centrality with temporal edge weights to identify critical infrastructure nodes in evolving power grid networks. Formalize your time-aware centrality calculation formula.
+13. Create a genetic algorithm approach for optimal pathfinding in transportation networks that combines Yen's k-shortest paths with semi-supervised learning from community detection results.
 
-14. Design a parallelized implementation of the Eulerian path detection algorithm optimized for Neo4j's native graph storage. Include Cypher query optimizations and index strategies to efficiently verify the degree parity condition across large datasets.
+14. Architect a multi-layer graph analysis pipeline that correlates restaurant category similarity scores with review patterns identified through modularity optimization in the Yelp dataset implementation.
 
-15. Create a disaster recovery protocol for distributed graph processing that maintains algorithm state consistency across Spark worker nodes and Neo4j database replicas during network partitions. Specify your checkpointing strategy and failover mechanisms.
-
-These questions require students to synthesize multiple concepts from the study materials, develop novel solutions, and create optimized implementations while considering real-world constraints and system architectures mentioned in the context.
+15. Design an adaptive feature importance weighting system for machine learning models that dynamically balances triangle count statistics with community membership features based on current network density metrics.
 
 Provide appropriate justification for accepting or rejecting a question.
 Do not give unnecessary text with special characters.
